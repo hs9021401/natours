@@ -18,6 +18,7 @@ const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
+//Start express app
 const app = express();
 
 //Template view engine, 用來在server端render出網頁送給client端
