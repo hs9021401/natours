@@ -1,0 +1,143 @@
+extends base
+
+//- 將一個mixin放到另外一個檔案存起來, 再include
+include _reviewCard
+
+
+block append head
+    script(src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js')
+    link(rel='stylesheet', href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css')
+    
+    //- script(src='/js/mapbox.js')
+
+//- 建立一個類似function的東西, 達到重用性
+mixin overviewBox(label, text, icon)
+    .overview-box__detail
+        svg.overview-box__icon
+            use(xlink:href=`/img/icons.svg#icon-${icon}`)
+        span.overview-box__label= label
+        span.overview-box__text= text   
+
+
+block content
+
+    section.section-header
+        .header__hero
+            .header__hero-overlay &nbsp;
+            img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+
+        .heading-box
+            h1.heading-primary
+                span= `${tour.name} tour`
+            .heading-box__group
+                .heading-box__detail
+                    svg.heading-box__icon
+                        use(xlink:href='/img/icons.svg#icon-clock')
+                    span.heading-box__text= `${tour.duration}DAYS`
+                .heading-box__detail
+                    svg.heading-box__icon
+                        use(xlink:href='/img/icons.svg#icon-map-pin')
+                    span.heading-box__text= tour.startLocation.description
+
+    section.section-description
+        .overview-box
+            div 
+                .overview-box__group
+                    h2.heading-secondary.ma-bt-lg Quick facts
+
+                    //- 以下code我們可以在最上方建立mixin函式, 簡化 
+                    //- .overview-box__detail
+                    //-     svg.overview-box__icon
+                    //-         use(xlink:href='/img/icons.svg#icon-calendar')
+                    //-     span.overview-box__label Next date
+                    //-     span.overview-box__text August 2021
+                    //- .overview-box__detail
+                    //-     svg.overview-box__icon
+                    //-         use(xlink:href='/img/icons.svg#icon-trending-up')
+                    //-     span.overview-box__label Difficulty
+                    //-     span.overview-box__text= tour.difficulty
+                    //-  .overview-box__detail
+                    //-     svg.overview-box__icon
+                    //-         use(xlink:href='/img/icons.svg#icon-user')
+                    //-     span.overview-box__label Participants
+                    //-     span.overview-box__text= `${tour.reviews.length} People` 
+                    //-  .overview-box__detail
+                    //-     svg.overview-box__icon
+                    //-         use(xlink:href='/img/icons.svg#icon-star')
+                    //-     span.overview-box__label Rating
+                    //-     span.overview-box__text 4.9 / 5
+
+                    //- 呼叫mixin函式, 要在前面加一個+號, 日期只取年月的話可以使用toLocaleString函式
+                    -const startdate = tour.startDates[0].toLocaleString('en-us', {month:'long', year:'numeric'})
+                    +overviewBox('Next date', startdate, 'calendar')
+                    +overviewBox('Difficulty', tour.difficulty, 'trending-up')
+                    +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
+                    +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
+
+                .overview-box__group
+                    h2.heading-secondary.ma-bt-lg Your tour guides
+
+                    each guide in tour.guides                    
+                        .overview-box__detail
+                            img.overview-box__img(src=`/img/users/${guide.photo}`, alt=`${guide.name}`)
+                            
+                            - if (guide.role === 'lead-guide')
+                                span.overview-box__label Lead guide
+                            - if (guide.role === 'guide')
+                                span.overview-box__label Tour guide
+                            span.overview-box__text= guide.name
+
+        .description-box
+            h2.heading-secondary.ma-bt-lg= `About ${tour.name} tour`
+            - const paragraphs = tour.description.split('\n')
+            each p in paragraphs
+                p.description__text= p
+            
+
+    section.section-pictures
+        each img, i in tour.images
+            .picture-box
+                img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour ${i + 1}`, class= `picture-box__img--${i + 1}`)
+            
+
+    section.section-map
+        //- #map 會建立一個 <div id='map'> </div>
+        //- 再新增一個attribute data-location 等於 tour的location, 但是HTML不可以存放array的東西, 因此使用JSON.stringify轉換成字串
+        //- 在mapbox.js 第三行會使用到
+        #map(data-locations=`${JSON.stringify(tour.locations)}`)
+
+    section.section-reviews
+        .reviews
+            each review in tour.reviews
+                +reviewCard(review)                
+                //- .reviews__card
+                //-     .reviews__avatar
+                //-         img.reviews__avatar-img(src='/img/users/user-7.jpg', alt='Jim Brown')
+                //-         h6.reviews__user Jim Brown
+                //-     p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepe numquam.
+                //-     .reviews__rating
+                //-         svg.reviews__star.reviews__star--active
+                //-             use(xlink:href='/img/icons.svg#icon-star')
+                //-         svg.reviews__star.reviews__star--active
+                //-             use(xlink:href='/img/icons.svg#icon-star')
+                //-         svg.reviews__star.reviews__star--active
+                //-             use(xlink:href='/img/icons.svg#icon-star')
+                //-         svg.reviews__star.reviews__star--active
+                //-             use(xlink:href='/img/icons.svg#icon-star')
+                //-         svg.reviews__star.reviews__star--active
+                //-             use(xlink:href='/img/icons.svg#icon-star')
+
+    section.section-cta
+        .cta
+            .cta__img.cta__img--logo
+                img(src='/img/logo-white.png', alt='Natours logo')
+            img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1]}`, alt='Tour Picture')
+            img.cta__img.cta__img--2(src=`/img/tours/${tour.images[2]}`, alt='Tour Picture')
+            .cta__content
+                h2.heading-secondary What are you waiting for?
+                p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+
+                if user
+                    button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
+                else
+                    a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
