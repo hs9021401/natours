@@ -83,7 +83,7 @@ userSchema.pre(/^find/, function(next) {
 
 //建立instance method, 檢查輸入的 password 是否正確
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
-    console.log('correctPassword-->', candidatePassword, userPassword);
+    // console.log('correctPassword-->', candidatePassword, userPassword);
     //candidatePassword是未被加密的明文密碼, userPassword是已被hashed過的密碼
     return await bcrypt.compare(candidatePassword, userPassword);
 };
@@ -106,7 +106,7 @@ userSchema.methods.createPasswordResetToken = function() {
         .createHash('sha256')
         .update(resetToken)
         .digest('hex');
-    console.log({ resetToken }, this.passwordResetToken);
+    // console.log({ resetToken }, this.passwordResetToken);
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     return resetToken;

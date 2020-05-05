@@ -85,7 +85,7 @@ reviewSchema.post('save', function() {
 reviewSchema.pre(/^findOneAnd/, async function(next) {
     //this是query物件, 將取得的Document使用this.r塞到this物件裡面去, 這樣就可以在 post middleware存取(需要等到update/delete後才計算, 所以我們需要帶到post middle在計算統計)
     this.r = await this.findOne();
-    console.log(this.r);
+    // console.log(this.r);
     next();
 });
 

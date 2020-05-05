@@ -69,7 +69,7 @@ if (updatePassForm) {
 }
 
 if (bookBtn) {
-    console.log('BOOK tour button exist!!!');
+    // console.log('BOOK tour button exist!!!');
     bookBtn.addEventListener('click', e => {
         e.target.textContent = 'Processing...';
         const { tourId } = e.target.dataset;

@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 //const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 
@@ -36,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Helmet 實際上只由 9 個小型中介軟體函數組成，這些函數會設定安全相關的 HTTP 標頭：
 app.use(helmet());
 
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
@@ -71,6 +72,9 @@ app.use(xss());
 //         whitelist: ['duration', 'ratingsAverage', 'ratingsQuantity', 'maxGroupSize', 'difficulty', 'price']
 //     })
 // );
+
+//回傳給client的response將會被壓縮, 以達到高效能
+app.use(compression());
 
 //Our Own Middleware
 app.use((req, res, next) => {
