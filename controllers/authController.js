@@ -17,17 +17,15 @@ const signToken = id => {
     });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
     const token = signToken(user._id);
 
     //設定token為cookie發送給client端
-    const cookieOptions = {
+    res.cookie('jwt', token, {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000), //用來設定持續性 Cookie 的到期日。
-        httpOnly: true // 確保只透過 HTTP(S) 傳送 Cookie，而不透過用戶端 JavaScript 傳送，如此有助於防範跨網站 Scripting 攻擊。
-    };
-
-    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true; //secure =true 確保瀏覽器只透過 HTTPS 傳送 Cookie。
-    res.cookie('jwt', token, cookieOptions);
+        httpOnly: true, // 確保只透過 HTTP(S) 傳送 Cookie，而不透過用戶端 JavaScript 傳送，如此有助於防範跨網站 Scripting 攻擊。
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+    });
 
     //Remove password from output
     user.password = undefined;
@@ -58,7 +56,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     // });
 
     //回傳jwt token給client
-    createSendToken(newUser, 201, res);
+    createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -78,7 +76,7 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     //3)  If everything OK, send token to client
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 });
 
 exports.logout = (req, res) => {
@@ -221,7 +219,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     await user.save();
 
     //4) Log the user in, send JWT
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -239,5 +237,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     await user.save();
 
     //4) Log use in, send JWT
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 });

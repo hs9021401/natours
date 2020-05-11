@@ -22,6 +22,8 @@ const viewRouter = require('./routes/viewRoutes');
 //Start express app
 const app = express();
 
+app.enable('trust proxy');
+
 //Template view engine, 用來在server端render出網頁送給client端
 //Express 有support
 app.set('view engine', 'pug');
