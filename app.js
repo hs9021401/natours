@@ -19,6 +19,8 @@ const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
+const cors = require('cors');
+
 //Start express app
 const app = express();
 
@@ -28,6 +30,12 @@ app.enable('trust proxy');
 //Express 有support
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
+
+//Implement CORS 跨來源資源共用, GET/POST指令
+app.use(cors());
+
+//而PATCH/DELETE/PUT指令則需要另外設定options
+app.options('*', cors());
 
 //載入靜態資源, 可直接輸入url存取public底下的所有資源
 // http://127.0.0.1:3000/overview.html  因為指定public為根目錄, 所以路徑不需要加public
