@@ -14,7 +14,7 @@ const router = new express.Router();
 // });
 
 //使用authController.isLoggedIn middleware去檢查是否logged in, 乃至於將UI右上角的登入狀態顯示在pug (res.locals.user)
-router.get('/', bookingController.createBookingCheckout, authController.isLoggedIn, viewsController.getOverview);
+router.get('/', authController.isLoggedIn, viewsController.getOverview);
 
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
 
@@ -23,7 +23,11 @@ router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 
 router.get('/me', authController.protect, viewsController.getAccount);
 
-router.get('/my-tours', authController.protect, viewsController.getMyTours);
+router.get(
+    '/my-tours',
+    /*bookingController.createBookingCheckout,*/ authController.protect,
+    viewsController.getMyTours
+);
 
 router.post('/submit-user-data', authController.protect, viewsController.updateUserData);
 

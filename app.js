@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 //const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const compression = require('compression');
 
 const AppError = require('./utils/appError');
@@ -17,6 +18,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 
 const cors = require('cors');
@@ -60,6 +62,9 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+
+//因為我們stripe需要將post視為一般的raw form而非json, 所以我們要把它放在body parser之前, 以免被parse成json物件
+app.post('/webhook-checkout', bodyParser.raw({ type: 'application/json' }), bookingController.webhookCheckout);
 
 //Reading data from body into req.body
 //限制傳送的內文不可超過10kb
