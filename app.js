@@ -63,7 +63,7 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 
-//因為我們stripe需要將post視為一般的raw form而非json, 所以我們要把它放在body parser之前, 以免被parse成json物件
+//因為我們在stripe成功付款後它會將訊息post回來, 而是一般的raw form非json, 所以我們要把它放在body parser之前, 以免被parse成json物件
 app.post('/webhook-checkout', bodyParser.raw({ type: 'application/json' }), bookingController.webhookCheckout);
 
 //Reading data from body into req.body
