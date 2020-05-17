@@ -13,6 +13,8 @@ const router = new express.Router();
 //     //另外我們還可以丟物件進去到pug檔裡面使用
 // });
 
+router.use(viewsController.alerts);
+
 //使用authController.isLoggedIn middleware去檢查是否logged in, 乃至於將UI右上角的登入狀態顯示在pug (res.locals.user)
 router.get('/', authController.isLoggedIn, viewsController.getOverview);
 
